@@ -12,6 +12,8 @@ using Beerhall.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Beerhall.Models.Domain;
+using Beerhall.Data.Repositories;
 
 namespace Beerhall {
     public class Startup {
@@ -31,10 +33,14 @@ namespace Beerhall {
             services.AddControllersWithViews()
                 .AddRazorRuntimeCompilation();
             services.AddRazorPages();
+            services.AddScoped<BeerhallDataInitializer>();
+            services.AddScoped<IBrewerRepository, BrewerRepository>();
+            services.AddScoped<ILocationRepository, LocationRepository>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, BeerhallDataInitializer beerhallDataInitializer) {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -58,9 +64,11 @@ namespace Beerhall {
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Brewer}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
+
+            beerhallDataInitializer.InitializeData();
         }
     }
 }
