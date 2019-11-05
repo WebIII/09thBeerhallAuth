@@ -68,7 +68,7 @@ namespace Beerhall {
                 endpoints.MapRazorPages();
             });
 
-            beerhallDataInitializer.InitializeData();
+            beerhallDataInitializer.InitializeData().Wait();
         }
     }
 }

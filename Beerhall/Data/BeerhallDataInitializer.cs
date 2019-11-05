@@ -1,18 +1,23 @@
 ﻿using Beerhall.Models.Domain;
+using Microsoft.AspNetCore.Identity;
 using System;
+using System.Threading.Tasks;
 
 namespace Beerhall.Data {
     public class BeerhallDataInitializer {
         private readonly ApplicationDbContext _dbContext;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public BeerhallDataInitializer(ApplicationDbContext dbContext) {
+        public BeerhallDataInitializer(ApplicationDbContext dbContext, UserManager<IdentityUser> userManager) {
             _dbContext = dbContext;
+            _userManager = userManager;
         }
 
-        public void InitializeData() {
+        public async Task InitializeData() {
             _dbContext.Database.EnsureDeleted();
             if (_dbContext.Database.EnsureCreated())
             {
+                await InitializeUsers();
                 Location bavikhove = new Location { Name = "Bavikhove", PostalCode = "8531" };
                 Location roeselare = new Location { Name = "Roeselare", PostalCode = "8800" };
                 Location puurs = new Location { Name = "Puurs", PostalCode = "2870" };
@@ -72,6 +77,16 @@ namespace Beerhall.Data {
 
                 _dbContext.SaveChanges();
             }
+        }
+
+        private async Task InitializeUsers() {
+            string eMailAddress = "beermaster@hogent.be";
+            IdentityUser user = new IdentityUser { UserName = eMailAddress, Email = eMailAddress };
+            await _userManager.CreateAsync(user, "P@ssword1");
+
+            eMailAddress = "jan@hogent.be";
+            user = new IdentityUser { UserName = eMailAddress, Email = eMailAddress };
+            await _userManager.CreateAsync(user, "P@ssword1");
         }
     }
 }
