@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Beerhall.Models.Domain;
 using Beerhall.Data.Repositories;
+using System.Security.Claims;
 
 namespace Beerhall {
     public class Startup {
@@ -30,6 +31,11 @@ namespace Beerhall {
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy => policy.RequireClaim(ClaimTypes.Role, "admin"));
+                options.AddPolicy("Customer", policy => policy.RequireClaim(ClaimTypes.Role, "customer"));
+            });
             services.AddControllersWithViews()
                 .AddRazorRuntimeCompilation();
             services.AddRazorPages();
